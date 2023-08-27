@@ -1,0 +1,20 @@
+name: Check Commit Messages
+on:
+  push:
+    branches:
+      - main  # Adjust this to match the branch you want to enforce on
+
+jobs:
+  check_commit_messages:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check Commit Messages
+      run: |
+        for commit in $(git log --format='%H' ${{ github.event.before }}..${{ github.sha }}); do
+          commit_msg=$(git log --format=%B -n 1 $commit)
+          if [[ ! "$commit_msg" =~ ^Feature: ]]; then
+            echo "ERROR: Commit message in $commit doesn't start with 'Feature: '"
+            exit 1
+          fi
+        done
